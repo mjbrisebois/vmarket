@@ -2,7 +2,7 @@
 
 import sqlite3 as sql
 
-conn			= sql.connect('vmarket.db')
+conn			= sql.connect('databases/vmarket.db')
 c			= conn.cursor()
 
 """
@@ -43,6 +43,14 @@ class market(object):
         """del market[item_id] will do nothing."""
         pass
 
+    def __iter__(self):
+        c.execute("SELECT * FROM items")
+        while True:
+            item	= c.fetchone()
+            if item is None:
+                break
+            yield item
+
     def post(self, seller_id, description=None, quantity=None):
         """Posting an item to the market.  The description message will describe
         what the seller wants for this item.
@@ -51,6 +59,7 @@ class market(object):
         # if the table doesn't exist already we need to make it
         c.execute("INSERT INTO items (seller_id, description, quantity) VALUES (?,?,?)",
                   (seller_id, description, quantity))
+        conn.commit()
         item_id		= c.lastrowid
         return item_id
 
