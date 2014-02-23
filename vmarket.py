@@ -1,23 +1,27 @@
 #!/usr/bin/python
 
-import sqlite3 as sql
+import os, logging
+from utils	import setup
 
-conn			= sql.connect('databases/vmarket.db')
+log			= setup.logging( name=__file__ )
+db_file			= 'databases/vmarket.db'
+
+create_tables		= False
+if not os.path.exists(db_file):
+    # If the database doesn't already exists set flag for creating tables
+    create_tables	= True
+
+conn			= setup.db_connect(db_file)
 c			= conn.cursor()
 
-"""
-items
-  item_id
-  seller_id
-  description
-  quantity
-"""
-c.execute("""CREATE TABLE IF NOT EXISTS items (
-          item_id	INTEGER PRIMARY KEY AUTOINCREMENT,
-          seller_id	INTEGER,
-          description	TEXT,
-          quantity	INTEGER
-      )""")
+if create_tables:
+    c.execute("""CREATE TABLE IF NOT EXISTS items (
+              item_id		INTEGER PRIMARY KEY AUTOINCREMENT,
+              seller_id		INTEGER,
+              description	TEXT,
+              quantity		INTEGER
+          )""")
+
 
 class market(object):
     
