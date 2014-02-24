@@ -1,0 +1,106 @@
+
+* Virtual Market
+
+  In a virtual market the user should be able to do anything that would be
+  possible in a real world market.  This includes: selling items at a set price,
+  selling items for a trade, offering a trade, buying items, auctioning items.
+
+** Technical Implementation
+   
+   Python module uses sqlite as it's database so that everything is isolated and
+   the module can run completely on it's own separate from any other database.
+   The data would be linked by using a unique user identity when posting data.
+
+   This example shows an implemented sell-buy transaction.
+
+   #+BEGIN_SRC python
+
+import vmarket as vmarket
+
+market		= vmarket.market()
+item_id		= market.post( <seller_user_id>, <item>, <description> )
+...
+item		= market[item_id]
+...
+market.purchase( item_id, <buyer_user_id> ) # purchase is the same as accept, both create an order
+...
+orders		= market.active_orders( item_id, quantity=1 )
+for order in orders:
+    print order # user <buyer_user_id> purchased <quantity>
+
+   #+END_SRC
+
+   This example shows an implemented trade transaction.
+
+   #+BEGIN_SRC python
+
+import vmarket as vmarket
+
+market		= vmarket.create()
+item_id		= market.post( <seller_user_id>, <item>, <data> )
+...
+item		= market.get( item_id )
+...
+offer_id	= market.offer( item_id, <buyer_user_id>, message="bla bla" )
+...
+# Is accepting an offer the same as creating an order?
+market.accept_offer( offer_id, <seller_user_id> )
+...
+orders		= market.active_orders( item_id, quantity=1 )
+for order in orders:
+    print order # user <buyer_user_id> purchased <quantity>
+
+   #+END_SRC
+
+*** Market() API
+
+**** post()    
+     
+     Posting an item to the market.  The description message will describe what
+     the seller wants for this item.
+     
+     *IDEA:* Perhaps the market could remember for the seller the offer details
+      so that when the buyer accepts it can serve up that data and foreign code
+      could use it to make the transfer of goods automatically happen.  The
+      market would not ever use this info for anything, it would just attach it
+      to the item for recalling later.
+
+**** offer()
+
+     Optionally the buyer can make an offer to the seller for something that may
+     not be what the seller asked for.
+
+**** accept()
+
+     The buyer or the seller can accept the terms and an order for the item will
+     be created.
+
+** Market Types
+
+*** Buyer Beware
+
+    *NOTE:* seller posts item, buyer finds item and can purchase it, then seller
+     is alerted to the purchase.
+    
+    This is simulating a modern online market (like Kijiji or Ebay) which means
+    the information about the product is provided by the seller and there is no
+    guarantee that they are being truthful.  The seller could be lying about the
+    information of the product or the seller could take peoples money and simply
+    not give them the item.  This simulates a more modern economy since it
+    implies the scenario of long distance buyers and sellers.
+
+*** Middle Age
+    
+    Markets are set up in actually locations where they can charge for hosting
+    products.
+
+*** Distributor
+
+    This simulates a market based on the producer, distributor and retailer
+    roles.
+
+** Payment
+
+   Users will have bank account(s) where they can get generate payment cards
+   (much like credit cards) 
+   
